@@ -27,21 +27,32 @@
 
 <input type="number" id="preco" min="0" placeholder="Preço">
 <br>
+<input type="text" id="cor" placeholder="vermelho ou verde">
 <input type="text" id="cidade" placeholder="Cidade">
 <input type="number" id="precoCidade" placeholder="precoCidade">
 <button type="submit" id="procurar" class="btn btn-info">Procurar</button>
 
 <script>
 
+    const icons = (function () {
+        const base = './icons/';
+
+        return {
+            verde: base + 'verde.png',
+            vermelho: base + 'vermelho.png'
+        }
+    })();
+
     const getLatLong = (lat, lng) => {
         return {lat: lat, lng: lng};
     };
 
-    const newMarker = (position, map) => {
+    const newMarker = (position, icon, map) => {
 
         let marker = new google.maps.Marker({
             position: position,
-            map: map
+            map: map,
+            icon: icon
         });
 
         marker.setMap(map);
@@ -55,8 +66,6 @@
                 center_obj = getLatLong(37.772323, -122.214897),
                 map = new google.maps.Map(document.getElementById('map'), {zoom: 10, center: center_obj}),
                 allMarkers = [];
-
-
 
         $('body').on('click', '#selecionar', function () {
             console.log($("#selecionar").attr('hotelId'))
@@ -88,7 +97,8 @@
             evt.preventDefault();
 
             let cidade = $('#cidade').val(),
-                    precoCidade = $('#precoCidade').val() || 0;
+                    precoCidade = $('#precoCidade').val() || 0,
+                    cor = $('#cor').val() || "vermelho";
 
             $.get( "https://maps.googleapis.com/maps/api/geocode/json?address=" + cidade, function( data ) {
                 console.log(data)
@@ -97,9 +107,8 @@
                         lat = location.lat,
                         lng = location.lng;
 
-                let marker = newMarker(getLatLong(lat, lng), map);
+                let marker = newMarker(getLatLong(lat, lng), icons[cor], map);
 
-//                        marker.id = i;
                 marker.preco = precoCidade;
                 marker.rendered = true;
 
