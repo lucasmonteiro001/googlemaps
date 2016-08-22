@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="./node_modules/jquery/dist/jquery.js"></script>
+    <script src="./node_modules/gmap3/dist/gmap3.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAe5n3XK0Qj3UPQYJk0tpmylz3FNOebASM"></script>
+
+    <style>
+        #map {
+            display: block;
+            width: 100%;
+            height: 500px;
+        }
+        .marker {
+
+            background-color: aqua;
+            color: black
+
+        }
+    </style>
+
+</head>
+<body>
+<div id="map"></div>
+
+<input type="number" id="preco" min="0" placeholder="Preço">
+<br>
+<input type="text" id="cidade" placeholder="Cidade">
+<input type="number" id="precoCidade" placeholder="precoCidade">
+<button type="submit" id="procurar" class="btn btn-info">Procurar</button>
+
+<script>
+
+    const getLatLong = (lat, lng) => {
+        return {lat: lat, lng: lng};
+    };
+
+    const newMarker = (position, map) => {
+
+        let marker = new google.maps.Marker({
+            position: position,
+            map: map
+        });
+
+        marker.setMap(map);
+
+        return marker;
+    }
+
+    $(document).ready(function () {
+
+        let     infowindow = null,
+                center_obj = getLatLong(37.772323, -122.214897),
+                map = new google.maps.Map(document.getElementById('map'), {zoom: 10, center: center_obj}),
+                allMarkers = [];
+
+
+
+        $('body').on('click', '#selecionar', function () {
+            console.log($("#selecionar").attr('hotelId'))
+        });
+
+        $('body').on('change', '#preco', function () {
+
+            var preco = $('#preco').val();
+
+            for(var i = 0; i < allMarkers.length; i++) {
+
+                var marker = allMarkers[i];
+
+                if(marker.preco < Number(preco)) {
+                    marker.setMap(null);
+                    marker.rendered = false
+                }
+                else {
+                    if(!marker.rendered) {
+                        marker.setMap(map);
+                        marker.rendered = true
+                    }
+                }
+
+            }
+        });
+
+        $('#procurar').click(function (evt) {
+            evt.preventDefault();
+
+            let cidade = $('#cidade').val(),
+                    precoCidade = $('#precoCidade').val() || 0;
+
+            $.get( "https://maps.googleapis.com/maps/api/geocode/json?address=" + cidade, function( data ) {
+                console.log(data)
+                let obj = data.results[0],
+                        location = obj.geometry.location,
+                        lat = location.lat,
+                        lng = location.lng;
+
+                let marker = newMarker(getLatLong(lat, lng), map);
+
+//                        marker.id = i;
+                marker.preco = precoCidade;
+                marker.rendered = true;
+
+                marker.addListener('click', function() {
+                    if (infowindow) {
+                        infowindow.close();
+                    }
+                    infowindow = new google.maps.InfoWindow({
+                        content: "<div class='col-xs-12 infowindow'><img style='width:50px; height: 50px' src='http://407a441c.ngrok.io/imagens/Paris'><button id='selecionar' hotelId='"+cidade+"'> "+ cidade + ' $' + precoCidade +"</button></div>"
+                    });
+                    infowindow.open(map, marker);
+                });
+
+                allMarkers.push(marker);
+            });
+
+        });
+
+
+//        allMarkers[4].setMap(null);
+
+
+
+
+
+
+
+    });
+
+</script>
+</body>
+</html>
