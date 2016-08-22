@@ -19,6 +19,68 @@
             color: black
 
         }
+        .infowindow {
+            height:40px !important;
+            width:120px;
+            float:left;
+            overflow: hidden;
+        }
+        .infowindow  img {
+            width:40px !important;
+            height:40px;
+            float:left;
+            margin-right: 10px;
+            padding-top:0;
+            margin-top:0;
+        }
+        .infowindow p {
+            padding:0 0 0 0;
+            margin:0 0 0 0;
+        }
+        .action-btns {
+            float:left;
+            width:70px;
+            overflow: hidden;
+            position: relative;
+            top:12px;
+            left: 6px;
+        }
+        .action-btns i {
+            font-size: 18px;
+            color: #78A737;
+            margin-left: 3px;
+        }
+        .action-btns i:hover {
+            transition: color 0.5s ease;
+            color:#ccc;
+            cursor: pointer;
+        }
+        .infowindow h6.address {
+            padding:6px 5px 1px 0;
+            margin:0 0 0 0;
+            font-family:"Roboto Slab";
+            color: #0c99c8;
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .infowindow p {
+            padding:0 0 0 0;
+            margin:0 0 0 0;
+        }
+        .infowindow  p.price {
+            color:#B25B00;
+        }
+        .infowindow img {
+            width:40px !important;
+            height:40px;
+            float:left;
+            margin-right: 10px;
+            padding-top:0;
+            margin-top:0;
+        }
+
     </style>
 
 </head>
@@ -42,6 +104,11 @@
             vermelho: base + 'vermelho.png'
         }
     })();
+
+    const moverPara = (position, map) => {
+        // vai para a posicao do marker
+        map.panTo(position);
+    }
 
     const getLatLong = (lat, lng) => {
         return {lat: lat, lng: lng};
@@ -117,12 +184,14 @@
                         infowindow.close();
                     }
                     infowindow = new google.maps.InfoWindow({
-                        content: "<div class='col-xs-12 infowindow'><img style='width:50px; height: 50px' src='http://407a441c.ngrok.io/imagens/Paris'><button id='selecionar' hotelId='"+cidade+"'> "+ cidade + ' $' + precoCidade +"</button></div>"
+                        content: "<div class='col-xs-12 infowindow'><img><div class='infowindow-text-wrap'><h6 class='address'>"+cidade+"</h6></div><p class='price'> $"+precoCidade+"</p><div class='action-btns'><i class='fa fa-check-square-o'>V</i></div>"
                     });
                     infowindow.open(map, marker);
                 });
 
                 allMarkers.push(marker);
+
+                moverPara(marker.position, map);
             });
 
         });
